@@ -36,8 +36,7 @@
 #[macro_use]
 extern crate log;
 extern crate mowl;
-extern crate term_size;
-extern crate ansi_term;
+extern crate termion;
 
 #[macro_use]
 pub mod error;
@@ -46,10 +45,10 @@ use std::u8;
 use std::cmp::max;
 use std::{convert, fmt, iter};
 
-use error::{RainResult, ErrorType, bail};
+use error::{RainResult, ErrorType};
 
 use log::LogLevel;
-use ansi_term::Colour;
+use termion::color::{self, LightBlack, Reset, Fg};
 
 /// The graph drawing structure
 pub struct Graph<V> {
@@ -172,7 +171,7 @@ impl<V> Graph<V>
     pub fn print(&mut self) -> RainResult<()> {
         /// Prints the fillchar to the terminal
         fn fillchar() -> String {
-            format!("{}", Colour::Fixed(8).paint("┈"))
+            format!("{}┈{}", Fg(LightBlack), Fg(Reset))
         }
 
         // Do the actual printing per column
@@ -182,7 +181,7 @@ impl<V> Graph<V>
         let end_char = "┴";
         let col_width = 2;
 
-        let (width, _) = Self::get_terminal_dimensions()?;
+        let (width, _) = termion::terminal_size()?;
 
         let prefix_len = 10;
         let mut cursor = prefix_len;
@@ -194,7 +193,7 @@ impl<V> Graph<V>
             prefix: Option<String>,
         }
         let mut row = Row {
-            content: String::with_capacity(width),
+            content: String::with_capacity(width as usize),
             prefix: None,
         };
 
@@ -226,10 +225,10 @@ impl<V> Graph<V>
             let free_column = match *column {
                 Column::Used(ref mut line) => {
                     // Get a row prefix format and keep three characters left
-                    let mut row_prefix = format!("{:>width$.*}",
-                                                 prefix_len - 3,
+                    let mut row_prefix = format!("{:>w$.*}",
+                                                 prefix_len as usize - 3,
                                                  line.name,
-                                                 width = prefix_len - 3);
+                                                 w = prefix_len as usize - 3);
 
                     // Get the character to be printed
                     let (c, free_column) = if line.started {
@@ -252,7 +251,7 @@ impl<V> Graph<V>
                     let value = line.values.last().cloned().unwrap_or_default();
                     let (r, g, b) = Self::rgb(min.clone(), max.clone(), value.clone());
 
-                    row.content += &format!("{}", Colour::RGB(r, g, b).paint(c));
+                    row.content += &format!("{}{}{}", Fg(color::Rgb(r, g, b)), c, Fg(Reset));
                     row.content += &fillchar();
 
                     // Reset the line indicator for the data
@@ -281,7 +280,7 @@ impl<V> Graph<V>
         // Print the row including the prefix if set
         let prefix_string = match row.prefix {
             Some(prefix) => prefix,
-            _ => iter::repeat(' ').take(prefix_len).collect::<String>(),
+            _ => iter::repeat(' ').take(prefix_len as usize).collect::<String>(),
         };
         println!("{}{}", prefix_string, row.content);
 
@@ -370,14 +369,6 @@ impl<V> Graph<V>
         g = g.saturating_add(soft_scale);
 
         (r, g, b)
-    }
-
-    /// Returns the current terminal dimensions if possible
-    fn get_terminal_dimensions() -> RainResult<(usize, usize)> {
-        term_size::dimensions().ok_or_else(|| {
-            bail(ErrorType::TerminalDimensions,
-                 &"Could not get terminal dimensions")
-        })
     }
 }
 

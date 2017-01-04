@@ -11,10 +11,9 @@ documentation = "https://docs.rs/rain"
 description = "Visualize vertical data inside your terminal."
 
 [dependencies]
-ansi_term = "0"
 log = "0"
 mowl = "1"
-term_size = "0"
+termion = "1"
 
 [dev-dependencies]
 rand = "0"

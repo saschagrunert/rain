@@ -11,7 +11,7 @@ use rand::distributions::{IndependentSample, Range};
 
 #[test]
 fn add_remove_success_1() {
-    let mut graph = Graph::new().set_log_level(LogLevel::Trace);
+    let mut graph = Graph::new().set_log_level(LogLevel::Warn);
     assert!(graph.add("Line 1", 0).is_ok());
     assert!(graph.print().is_ok());
     assert!(graph.add("Line 2", 0).is_ok());
@@ -36,7 +36,7 @@ fn add_remove_success_1() {
 
 #[test]
 fn add_remove_success_2() {
-    let mut graph = Graph::new().set_log_level(LogLevel::Trace);
+    let mut graph = Graph::new().set_log_level(LogLevel::Warn);
     for i in 1..50 {
         if i > 25 {
             assert!(graph.remove(&(i - 25).to_string()).is_ok());
