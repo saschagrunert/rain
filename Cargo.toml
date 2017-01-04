@@ -1,0 +1,20 @@
+[package]
+name = "rain"
+version = "0.1.0"
+license = "MIT"
+readme = "README.md"
+keywords = ["log", "logger", "vertical", "terminal", "graph"]
+authors = ["Sascha Grunert <mail@saschagrunert.de>"]
+repository = "https://github.com/saschagrunert/rain"
+homepage = "https://github.com/saschagrunert/rain"
+documentation = "https://docs.rs/rain"
+description = "Visualize vertical data inside your terminal."
+
+[dependencies]
+ansi_term = "0"
+log = "0"
+mowl = "1"
+term_size = "0"
+
+[dev-dependencies]
+rand = "0"
