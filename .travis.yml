@@ -28,7 +28,6 @@ notifications:
     on_success: never
 os:
   - linux
-  - osx
 addons:
   apt:
     sources:
