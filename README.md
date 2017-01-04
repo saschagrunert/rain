@@ -6,6 +6,7 @@ represents its value, whereas blue is low and red is high. These color bounds wi
 runtime. Beside this, the terminal dimensions are adapted during runtime, too. If no data was added to a line, their
 terminal line is dashed.
 
+![Example](https://github.com/saschagrunert/rain/raw/master/.github/example.gif)
 
 ## Example usage
 
