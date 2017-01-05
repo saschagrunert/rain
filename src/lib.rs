@@ -54,6 +54,7 @@ use termion::color::{self, LightBlack, Reset, Fg};
 pub struct Graph<V> {
     lines_to_be_removed: Vec<String>,
     columns: Vec<Column<V>>,
+    prefix_len: usize,
 }
 
 impl<V> Graph<V>
@@ -69,11 +70,25 @@ impl<V> Graph<V>
     /// let _ :Graph<u8> = Graph::new();
     /// ```
     pub fn new() -> Self {
+        Self::with_prefix_length(8)
+    }
+
+    /// Create a new `Graph` for drawing with a custom length of the identifier (prefix)
+    ///
+    /// # Example
+    /// ```
+    /// use rain::Graph;
+    ///
+    /// let _ :Graph<u8> = Graph::with_prefix_length(25);
+    /// ```
+    pub fn with_prefix_length(length: usize) -> Self {
         Graph {
             lines_to_be_removed: vec![],
             columns: vec![],
+            prefix_len: length + 3,
         }
     }
+
 
     /// Set the global log level for reporting
     pub fn set_log_level(self, level: LogLevel) -> Self {
@@ -183,8 +198,7 @@ impl<V> Graph<V>
 
         let (width, _) = termion::terminal_size()?;
 
-        let prefix_len = 10;
-        let mut cursor = prefix_len;
+        let mut cursor = self.prefix_len as u16;
         let end_cursor = if width % 2 == 0 { width - 2 } else { width - 1 };
 
         // A string representation for a row to be printed
@@ -226,9 +240,9 @@ impl<V> Graph<V>
                 Column::Used(ref mut line) => {
                     // Get a row prefix format and keep three characters left
                     let mut row_prefix = format!("{:>w$.*}",
-                                                 prefix_len as usize - 3,
+                                                 self.prefix_len - 3,
                                                  line.name,
-                                                 w = prefix_len as usize - 3);
+                                                 w = self.prefix_len - 3);
 
                     // Get the character to be printed
                     let (c, free_column) = if line.started {
@@ -280,7 +294,7 @@ impl<V> Graph<V>
         // Print the row including the prefix if set
         let prefix_string = match row.prefix {
             Some(prefix) => prefix,
-            _ => iter::repeat(' ').take(prefix_len as usize).collect::<String>(),
+            _ => iter::repeat(' ').take(self.prefix_len).collect::<String>(),
         };
         println!("{}{}", prefix_string, row.content);
 

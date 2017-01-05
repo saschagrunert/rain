@@ -84,6 +84,15 @@ fn add_remove_success_4() {
 }
 
 #[test]
+fn print_long_prefix_success() {
+    let mut graph = Graph::with_prefix_length(18);
+    assert!(graph.add("Line 1", 0).is_ok());
+    assert!(graph.print().is_ok());
+    assert!(graph.add("A very long prefix", 0).is_ok());
+    assert!(graph.print().is_ok());
+}
+
+#[test]
 fn print_if_new_data_success() {
     let mut graph = Graph::new();
     let l1 = "Line 1";
