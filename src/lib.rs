@@ -159,7 +159,7 @@ impl<V> Graph<V>
     {
         // Check if the line exists
         let line_name = format!("{}", identifier);
-        if let None = self.line_already_existing(&line_name) {
+        if self.line_already_existing(&line_name).is_none() {
             bail!(ErrorType::LineDoesNotExist,
                   "Line does not exist and can not be removed");
         }
@@ -227,7 +227,7 @@ impl<V> Graph<V>
         let (min, max) = (get_value!(min), get_value!(max));
 
         // Gather all columns together
-        for column in self.columns.iter_mut() {
+        for column in &mut self.columns {
             // Check if we an print more columns
             if end_cursor < cursor + col_width {
                 row.content += "…";
@@ -335,17 +335,13 @@ impl<V> Graph<V>
 
     /// Get the next free column and set the column as used
     fn get_next_free_column(&mut self) -> &mut Column<V> {
-        macro_rules! free_column_iter {
-            () => (self.columns.iter_mut().filter(|c| **c == Column::Free))
-        }
-
-        let free_column_count = free_column_iter!().count();
+        let free_column_count = self.columns.iter_mut().filter(|c| **c == Column::Free).count();
 
         if free_column_count == 0 {
             self.columns.push(Column::Free);
             self.columns.iter_mut().rev().next().unwrap()
         } else {
-            free_column_iter!().next().unwrap()
+            self.columns.iter_mut().find(|c| **c == Column::Free).unwrap()
         }
     }
 
