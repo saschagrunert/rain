@@ -1,6 +1,6 @@
 [package]
 name = "rain"
-version = "0.2.2"
+version = "0.3.0"
 license = "MIT"
 readme = "README.md"
 keywords = ["log", "logger", "vertical", "terminal", "graph"]
@@ -9,6 +9,12 @@ repository = "https://github.com/saschagrunert/rain"
 homepage = "https://github.com/saschagrunert/rain"
 documentation = "https://docs.rs/rain"
 description = "Visualize vertical data inside your terminal."
+categories = ["command-line-utilities"]
+license-file = "LICENSE"
+
+[badges]
+travis-ci = { repository = "saschagrunert/rain", branch = "master" }
+appveyor = { repository = "saschagrunert/rain", branch = "master", service = "github" }
 
 [dependencies]
 log = "0"
