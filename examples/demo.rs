@@ -3,7 +3,7 @@ extern crate rain;
 extern crate rand;
 
 use rain::Graph;
-use rand::distributions::{IndependentSample, Range};
+use rand::distributions::{Distribution, Range};
 use std::{thread, time::Duration};
 
 fn main() {
@@ -15,7 +15,7 @@ fn main() {
     fn sleep() {
         let between = Range::new(100, 800);
         let mut rng = rand::thread_rng();
-        thread::sleep(Duration::from_millis(between.ind_sample(&mut rng)));
+        thread::sleep(Duration::from_millis(between.sample(&mut rng)));
     }
 
     fn print(graph: &mut Graph<u8>) {
