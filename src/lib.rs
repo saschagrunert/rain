@@ -1,9 +1,10 @@
 //! # Visualize vertical data inside your terminal
 //!
-//! This library helps you to display line based data vertically within your terminal. The color of
-//! the actual graph represents its value, whereas blue is low and red is high. These color bounds
-//! will be calculated automatically during runtime. Beside this, the terminal dimensions are
-//! adapted during runtime, too. If no data was added to a line, their terminal line is dashed.
+//! This library helps you to display line based data vertically within your
+//! terminal. The color of the actual graph represents its value, whereas blue
+//! is low and red is high. These color bounds will be calculated automatically
+//! during runtime. Beside this, the terminal dimensions are adapted during
+//! runtime, too. If no data was added to a line, their terminal line is dashed.
 //!
 //! # Example usage
 //! ```
@@ -35,20 +36,15 @@
 
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate failure;
 extern crate mowl;
 extern crate termion;
 
-#[macro_use]
-pub mod error;
-
-use std::u8;
-use std::cmp::max;
-use std::{convert, fmt, iter};
-
-use error::{RainResult, ErrorType};
-
-use log::LogLevel;
-use termion::color::{self, LightBlack, Reset, Fg};
+use failure::Fallible;
+use log::LevelFilter;
+use std::{cmp::max, convert, fmt, iter, u8};
+use termion::color::{self, Fg, LightBlack, Reset};
 
 /// The graph drawing structure
 pub struct Graph<V> {
@@ -58,8 +54,9 @@ pub struct Graph<V> {
 }
 
 impl<V> Graph<V>
-    where V: Clone + Default + Ord + PartialEq + fmt::Debug,
-          f64: convert::From<V>
+where
+    V: Clone + Default + Ord + PartialEq + fmt::Debug,
+    f64: convert::From<V>,
 {
     /// Create a new `Graph` for drawing
     ///
@@ -67,19 +64,20 @@ impl<V> Graph<V>
     /// ```
     /// use rain::Graph;
     ///
-    /// let _ :Graph<u8> = Graph::new();
+    /// let _: Graph<u8> = Graph::new();
     /// ```
     pub fn new() -> Self {
         Self::with_prefix_length(8)
     }
 
-    /// Create a new `Graph` for drawing with a custom length of the identifier (prefix)
+    /// Create a new `Graph` for drawing with a custom length of the identifier
+    /// (prefix)
     ///
     /// # Example
     /// ```
     /// use rain::Graph;
     ///
-    /// let _ :Graph<u8> = Graph::with_prefix_length(25);
+    /// let _: Graph<u8> = Graph::with_prefix_length(25);
     /// ```
     pub fn with_prefix_length(length: usize) -> Self {
         Graph {
@@ -89,9 +87,8 @@ impl<V> Graph<V>
         }
     }
 
-
     /// Set the global log level for reporting
-    pub fn set_log_level(self, level: LogLevel) -> Self {
+    pub fn set_log_level(self, level: LevelFilter) -> Self {
         // Setup the logger if not already set
         if mowl::init_with_level(level).is_err() {
             warn!("Logger already set.");
@@ -101,7 +98,8 @@ impl<V> Graph<V>
         self
     }
 
-    /// Add a data value to the graph by some identifier which can be displayed somehow.
+    /// Add a data value to the graph by some identifier which can be displayed
+    /// somehow.
     ///
     /// # Example
     /// ```
@@ -112,10 +110,11 @@ impl<V> Graph<V>
     ///
     /// assert_eq!(line, "Line 1");
     /// ```
-    pub fn add<T>(&mut self, identifier: T, value: V) -> RainResult<T>
-        where T: fmt::Display
+    pub fn add<T>(&mut self, identifier: T, value: V) -> Fallible<T>
+    where
+        T: fmt::Display,
     {
-        /// Get a line name string from the identifier
+        // Get a line name string from the identifier
         let line_name = format!("{}", identifier);
         debug!("Adding value {:?} to line '{}'", value, line_name);
 
@@ -154,14 +153,14 @@ impl<V> Graph<V>
     /// let removed_line = graph.remove(line).unwrap();
     /// assert_eq!(removed_line, "Line 1");
     /// ```
-    pub fn remove<T>(&mut self, identifier: T) -> RainResult<T>
-        where T: fmt::Display
+    pub fn remove<T>(&mut self, identifier: T) -> Fallible<T>
+    where
+        T: fmt::Display,
     {
         // Check if the line exists
         let line_name = format!("{}", identifier);
         if self.line_already_existing(&line_name).is_none() {
-            bail!(ErrorType::LineDoesNotExist,
-                  "Line does not exist and can not be removed");
+            bail!("Line does not exist and can not be removed");
         }
 
         // Just push the line into a temporarily vector
@@ -183,7 +182,7 @@ impl<V> Graph<V>
     ///
     /// graph.print();
     /// ```
-    pub fn print(&mut self) -> RainResult<()> {
+    pub fn print(&mut self) -> Fallible<()> {
         /// Prints the fillchar to the terminal
         fn fillchar() -> String {
             format!("{}┈{}", Fg(LightBlack), Fg(Reset))
@@ -239,10 +238,12 @@ impl<V> Graph<V>
             let free_column = match *column {
                 Column::Used(ref mut line) => {
                     // Get a row prefix format and keep three characters left
-                    let mut row_prefix = format!("{:>w$.*}",
-                                                 self.prefix_len - 3,
-                                                 line.name,
-                                                 w = self.prefix_len - 3);
+                    let mut row_prefix = format!(
+                        "{:>w$.*}",
+                        self.prefix_len - 3,
+                        line.name,
+                        w = self.prefix_len - 3
+                    );
 
                     // Get the character to be printed
                     let (c, free_column) = if line.started {
@@ -252,7 +253,10 @@ impl<V> Graph<V>
                             row.prefix = Some(row_prefix);
                             (end_char, true)
                         } else {
-                            (if line.got_data { line_chr } else { nodata_c }, false)
+                            (
+                                if line.got_data { line_chr } else { nodata_c },
+                                false,
+                            )
                         }
                     } else {
                         row_prefix += " → ";
@@ -263,9 +267,15 @@ impl<V> Graph<V>
 
                     // Get the rgb value for the character
                     let value = line.values.last().cloned().unwrap_or_default();
-                    let (r, g, b) = Self::rgb(min.clone(), max.clone(), value.clone());
+                    let (r, g, b) =
+                        Self::rgb(min.clone(), max.clone(), value.clone());
 
-                    row.content += &format!("{}{}{}", Fg(color::Rgb(r, g, b)), c, Fg(Reset));
+                    row.content += &format!(
+                        "{}{}{}",
+                        Fg(color::Rgb(r, g, b)),
+                        c,
+                        Fg(Reset)
+                    );
                     row.content += &fillchar();
 
                     // Reset the line indicator for the data
@@ -303,7 +313,8 @@ impl<V> Graph<V>
         Ok(())
     }
 
-    /// Print only if new data is available. Returns an indicator if somethings was printed or not.
+    /// Print only if new data is available. Returns an indicator if somethings
+    /// was printed or not.
     ///
     /// # Example
     /// ```
@@ -317,15 +328,18 @@ impl<V> Graph<V>
     /// graph.print_if_new_data();
     /// graph.print_if_new_data();
     /// ```
-    pub fn print_if_new_data(&mut self) -> RainResult<bool> {
-        if !self.lines_to_be_removed.is_empty() ||
-           self.columns
-            .iter()
-            .filter(|c| match **c {
-                Column::Used(ref line) if line.got_data => true,
-                _ => false,
-            })
-            .count() > 0 {
+    pub fn print_if_new_data(&mut self) -> Fallible<bool> {
+        if !self.lines_to_be_removed.is_empty()
+            || self
+                .columns
+                .iter()
+                .filter(|c| match **c {
+                    Column::Used(ref line) if line.got_data => true,
+                    _ => false,
+                })
+                .count()
+                > 0
+        {
             self.print()?;
             Ok(true)
         } else {
@@ -335,23 +349,35 @@ impl<V> Graph<V>
 
     /// Get the next free column and set the column as used
     fn get_next_free_column(&mut self) -> &mut Column<V> {
-        let free_column_count = self.columns.iter_mut().filter(|c| **c == Column::Free).count();
+        let free_column_count = self
+            .columns
+            .iter_mut()
+            .filter(|c| **c == Column::Free)
+            .count();
 
         if free_column_count == 0 {
             self.columns.push(Column::Free);
             self.columns.iter_mut().rev().next().unwrap()
         } else {
-            self.columns.iter_mut().find(|c| **c == Column::Free).unwrap()
+            self.columns
+                .iter_mut()
+                .find(|c| **c == Column::Free)
+                .unwrap()
         }
     }
 
     // Returns a line if the name already exist within all columns
-    fn line_already_existing(&mut self, line_name: &str) -> Option<&mut Line<V>> {
+    fn line_already_existing(
+        &mut self,
+        line_name: &str,
+    ) -> Option<&mut Line<V>> {
         let line_string = line_name.to_owned();
         self.columns
             .iter_mut()
             .filter_map(|c| match *c {
-                Column::Used(ref mut line) if line_string == line.name => Some(line),
+                Column::Used(ref mut line) if line_string == line.name => {
+                    Some(line)
+                }
                 _ => None,
             })
             .next()
