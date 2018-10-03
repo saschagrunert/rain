@@ -1,12 +1,10 @@
+extern crate log;
 extern crate rain;
 extern crate rand;
-extern crate log;
-
-use std::thread;
-use std::time::Duration;
 
 use rain::Graph;
 use rand::distributions::{IndependentSample, Range};
+use std::{thread, time::Duration};
 
 fn main() {
     let g = &mut Graph::new();
