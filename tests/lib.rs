@@ -1,7 +1,3 @@
-extern crate log;
-extern crate rain;
-extern crate rand;
-
 use log::LevelFilter;
 use rain::Graph;
 use rand::distributions::{Distribution, Range};

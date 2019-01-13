@@ -34,15 +34,8 @@
 //! ```
 #![deny(missing_docs)]
 
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate failure;
-extern crate mowl;
-extern crate termion;
-
-use failure::Fallible;
-use log::LevelFilter;
+use failure::{bail, Fallible};
+use log::{debug, info, warn, LevelFilter};
 use std::{cmp::max, convert, fmt, iter, u8};
 use termion::color::{self, Fg, LightBlack, Reset};
 
