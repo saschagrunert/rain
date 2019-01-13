@@ -1,6 +1,6 @@
 # rain
 
-[![Build Status](https://travis-ci.org/saschagrunert/rain.svg)](https://travis-ci.org/saschagrunert/rain) [![Coverage Status](https://coveralls.io/repos/github/saschagrunert/rain/badge.svg)](https://coveralls.io/github/saschagrunert/rain?branch=master) [![master doc rain](https://img.shields.io/badge/master_doc-rain-blue.svg)](https://saschagrunert.github.io/rain) [![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/saschagrunert/rain/blob/master/LICENSE) [![Crates.io](https://img.shields.io/crates/v/rain.svg)](https://crates.io/crates/rain) [![doc.rs](https://docs.rs/rain/badge.svg)](https://docs.rs/rain)
+[![Build Status](https://travis-ci.org/saschagrunert/rain.svg)](https://travis-ci.org/saschagrunert/rain) [![Coverage Status](https://coveralls.io/repos/github/saschagrunert/rain/badge.svg)](https://coveralls.io/github/saschagrunert/rain?branch=master) [![master doc rain](https://img.shields.io/badge/master_doc-rain-blue.svg)](https://saschagrunert.github.io/rain) [![dependency status](https://deps.rs/repo/github/saschagrunert/rain/status.svg)](https://deps.rs/repo/github/saschagrunert/rain) [![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/saschagrunert/rain/blob/master/LICENSE) [![Crates.io](https://img.shields.io/crates/v/rain.svg)](https://crates.io/crates/rain) [![doc.rs](https://docs.rs/rain/badge.svg)](https://docs.rs/rain)
 
 ## Visualize vertical data inside your terminal :sweat_drops:
 
