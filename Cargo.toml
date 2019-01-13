@@ -1,6 +1,6 @@
 [package]
 name = "rain"
-version = "1.0.0"
+version = "1.0.1"
 license = "MIT"
 readme = "README.md"
 keywords = ["log", "logger", "vertical", "terminal", "graph"]
@@ -10,6 +10,7 @@ homepage = "https://github.com/saschagrunert/rain"
 documentation = "https://docs.rs/rain"
 description = "Visualize vertical data inside your terminal."
 categories = ["command-line-utilities"]
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "saschagrunert/rain", branch = "master" }

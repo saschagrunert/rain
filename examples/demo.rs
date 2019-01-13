@@ -1,7 +1,3 @@
-extern crate log;
-extern crate rain;
-extern crate rand;
-
 use rain::Graph;
 use rand::distributions::{Distribution, Range};
 use std::{thread, time::Duration};
