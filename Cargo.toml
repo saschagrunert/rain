@@ -19,7 +19,7 @@ travis-ci = { repository = "saschagrunert/rain", branch = "master" }
 failure = "0.1.2"
 log = "0.4.5"
 mowl = "2.0.0"
-termion = "1.5.1"
+termion = "2.0.1"
 
 [dev-dependencies]
 rand = "0.8.1"
